@@ -15,10 +15,6 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 
-  @ApiPropertyOptional({ description: 'Role of the user' })
-  @IsOptional()
-  @IsString()
-  role?: string;
 }
 export class UpdateUserDto {
   @ApiPropertyOptional()
@@ -44,7 +40,7 @@ export class UpdateUserDto {
 }
 export class ResponseUserDto {
   @ApiProperty({ description: 'Unique user ID' })
-  id: string;
+  _id: string;
 
   @ApiProperty({ description: 'Username of the user' })
   username: string;

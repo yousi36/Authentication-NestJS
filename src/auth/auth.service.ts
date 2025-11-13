@@ -7,44 +7,47 @@ import { CreateUserDto, LoginUserDto, ResponseUserDto } from '../libs/dto';
 @Injectable()
 export class AuthService {
   constructor(
+     private readonly jwtService: JwtService,
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+   
   ) {}
   async register(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
-    const { username, email, password, role } = createUserDto;
+    console.log("I am new Registeration",CreateUserDto);
+    const { username, email, password } = createUserDto;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const user = await this.userService.createUser({
       username,
       email,
       password: hashedPassword,
-      role,
     });
     return user;
   }
  async login(
   loginUserDto: LoginUserDto
 ): Promise<{ accessToken: string; user: ResponseUserDto }> {
+  console.log("I am login UserDto",loginUserDto);
   const { usernameOrEmail, password } = loginUserDto;
   const userDoc = await this.userService.findByUsername(usernameOrEmail);
+  console.log("i am userdoc",userDoc);
   if (!userDoc) {
     throw new UnauthorizedException('Invalid credentials');
   }
   const isPasswordValid = await bcrypt.compare(password, userDoc.password);
+  console.log("is password is valid",isPasswordValid);
   if (!isPasswordValid) {
     throw new UnauthorizedException('Invalid credentials');
   }
   const payload = { sub: userDoc._id, role: userDoc.role };
   const accessToken = this.jwtService.sign(payload);
-  const { password: _, _id, ...rest } = userDoc.toObject();
+  console.log("i have accesstoken",accessToken);
+  const { password: _, _id, ...rest } = userDoc;
   const responseUser: ResponseUserDto = {
-    id: _id.toString(),
+    _id: _id.toString(),
     username: rest.username,
     email: rest.email,
     role: rest.role,
     isActive: rest.isActive,
-    createdAt: rest.createdAt,
-    updatedAt: rest.updatedAt,
   };
 
   return {
@@ -52,4 +55,12 @@ export class AuthService {
     user: responseUser,
   };
 }
+ async profile(userId:string):Promise<ResponseUserDto>{
+   const user=this.userService.findById(userId);
+   if(!user){
+    throw new UnauthorizedException("User not Found");
+   }
+   return user;
+ }
+ 
 }
