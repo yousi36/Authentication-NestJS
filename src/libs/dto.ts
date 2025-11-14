@@ -1,5 +1,6 @@
 import { IsString, IsEmail, MinLength, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 export class CreateUserDto {
   @ApiProperty({ description: 'Unique username for login' })
@@ -49,7 +50,7 @@ export class ResponseUserDto {
   email: string;
 
   @ApiProperty({ description: 'Role of the user' })
-  role: string;
+  role: Types.ObjectId;
 
   @ApiProperty({ description: 'Is the user active?' })
   isActive: boolean;
